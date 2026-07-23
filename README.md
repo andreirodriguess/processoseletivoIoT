@@ -21,9 +21,7 @@ Preencha todas as seções abaixo de forma **clara, objetiva e técnica**.
 
 ## Visão Geral da Solução
 
-## Visão Geral da Solução
-
-O objetivo do projeto é simular um contador de produção não intrusivo, para ser aplicado como uma solução industrial de baixo custo para linhas de montagem. Utilizando um sensor óptico para detectar a passagem de peças em uma esteira, incrementando o valor de um contador ao longo de seu funcionamento. O sistema também pode ser resetado conforme necessário, por meio de um botão, e é capaz de detectar travamentos na esteira de produtos e alertar caso uma peça obstrua a fonte de luz por tempo prolongado. O usuário pode interagir com a simulação controlando a intensidade luminosa (dada em Lux) e avaliando as saídas de acordo com a maior ou menor quantidade, indicando a passagem de objetos pela esteira.
+O objetivo do projeto é simular um contador de produção não intrusivo, para ser aplicado como uma solução industrial de baixo custo para linhas de montagem. Utilizando um sensor óptico para detectar a passagem de peças em uma esteira, incrementando o valor de um contador ao longo de seu funcionamento. O sistema também pode ser resetado conforme necessário, por meio de um botão, e é capaz de detectar travamentos na esteira de produtos e alertar caso uma peça obstrua a fonte de luz por tempo prolongado. O usuário pode interagir com a simulação controlando a intensidade luminosa (dada em Lux) e avaliando as saídas de acordo com a maior ou menor quantidade, indicando a passagem de objetos pela esteira.  
 
 
 ---
