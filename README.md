@@ -1,17 +1,5 @@
 ## Relatório do Candidato
 
-O arquivo **`README.md` do seu repositório** deve ser utilizado como o  
-**relatório final do desafio técnico**.
-
-Preencha todas as seções abaixo de forma **clara, objetiva e técnica**.
-
-> **Dica importante**  
-> Não é necessário um relatório extenso.  
-> O principal critério é demonstrar **clareza nas decisões técnicas**, organização e entendimento do sistema embarcado desenvolvido.
-> Não mantenha os demais conteúdos escritos nesse arquivo README, aqui devem ser concentradas apenas informações referentes ao projeto desenvolvido.
-
----
-
 ### Identificação do Candidato
 
 - **Nome completo: Andrei Luiz da Silva Rodrigues**
@@ -28,80 +16,61 @@ O objetivo do projeto é simular um contador de produção não intrusivo, para 
 
 ## Arquitetura do Sistema Embarcado
 
-Explique a arquitetura lógica do seu projeto, abordando:
-
-
-
-- Fluxo principal do programa (`main.py`)
-- Estrutura de estados, loops ou temporizações
-- Como os componentes interagem entre si
-
-Se desejar, utilize tópicos ou um pequeno diagrama em texto.
-
+* Fluxo principal do programa (`main.py`):  
+ O código roda em um laço infinito (`while True`), lendo os dados do sensor óptico a cada ciclo, atualizando a máquina de estados da esteira e verificando o estado lógico do botão de reset, acionando as devidas rotinas para cada tarefa.
+* Estrutura de estados, loops e temporizações:  
+ Utilizando variáveis de controle (como `bloqueado` e `tempo_inicio_passagem`), gerenciam-se as transições da esteira, avaliando se ela está livre ou bloqueada. Utilizam-se temporizações não-bloqueantes para avaliar se a esteira está parada por um intervalo crítico (emitindo o alerta de micro-parada) e para realizar o debounce do botão, averiguando há quanto tempo foi apertado, além de identificar o momento exato em que é solto.
+* Interação entre os componentes:   
+O ESP32 recebe os dados analógicos do sensor óptico e os converte via ADC pela GPIO 33, enquanto recebe o estado lógico do botão de reset pela GPIO 19. Utilizando esses dados, o ESP32 controla os estados da aplicação e envia registros na saída serial sobre a situação atual da linha (alertas de micro-parada e confirmação de reset).
 ---
 
 ## Componentes Utilizados na Simulação
 
-Liste os principais componentes definidos no `diagram.json`, por exemplo:
-
-- Tipo de placa utilizada
-- LEDs, botões, sensores, atuadores, etc.
-- Função de cada componente no sistema
+1. **Microcontrolador (`board-esp32-devkit-c-v4`):**
+Foi responsável pelo processamento dos dados, pela comunicação serial (emitindo alertas e avisos quando necessário) e pela contagem de tempo, interagindo diretamente com os periféricos.
+2. **Botão (`wokwi-pushbutton`):**
+Utilizado para o reset e configurado na GPIO 19 do ESP32, zerava o valor das variáveis de controle quando pressionado, permitindo ao usuário resetar o turno. Configurado utilizando o resistor interno de Pull-up.
+3. **Sensor Fotorresistor LDR (`wokwi-photoresistor-sensor`):**
+Atua na detecção de objetos na esteira, enviando dados analógicos para a GPIO 33 do microcontrolador com informações sobre a intensidade da iluminação, a qual, quando reduzida, indica a presença de um objeto na esteira.
 
 ---
 
 ## Decisões Técnicas Relevantes
+1. **Mapeamento por faixas**
+Como o projeto só precisava lidar com certos níveis de intensidade de luminosidade, e como havia uma imprecisão no sensor fotorresistor que tornava difícil a criação de um algoritmo 100% eficiente na conversão do valor digital em bits para o valor correto em Lux, foi decidido fazer uma análise empírica das saídas para determinados valores em Lux escolhidos na simulação Wokwi. Com esses dados, foi possível identificar quando a luminosidade estava abaixo de certos níveis, indicando se a esteira estava ou não bloqueada.
 
-Explique brevemente decisões importantes tomadas durante o desenvolvimento, como:
+Por exemplo, após a leitura do sensor em um ambiente com 500 Lux de intensidade (limite que indicava esteira livre), a saída convertida no algoritmo era de 750 Lux devido à imprecisão do sensor. Optou-se, nesse caso, por converter todas as saídas abaixo de 750 Lux para um valor abaixo de 500, como 480 Lux. Isso foi aplicado em todos os limites de luminosidade, permitindo que o projeto funcionasse corretamente mesmo sem uma conversão exata. Foi uma decisão de engenharia na qual o problema foi resolvido de forma eficiente, sem a necessidade de criar um algoritmo complexo para lidar com a queda logarítmica do valor da saída do sensor.
 
-- Organização do código
-- Uso de funções, estados ou constantes
-- Estratégias para temporização ou controle lógico
+2. **Decisões gerais**
+Para organizar o fluxo do sistema, utilizaram-se variáveis de controle no gerenciamento dos estados do botão e no monitoramento de travamentos da esteira (registrando há quanto tempo o sensor permaneceu obstruído). Temporizações não-bloqueantes foram empregadas para identificar micro-paradas e realizar o debounce do botão. A solução foi modularizada em funções dedicadas para a leitura/conversão do sensor LDR e para o tratamento do botão de reset. Por fim, constantes foram definidas para armazenar parâmetros imutáveis, como os limiares de luminosidade (Lux) e o tempo limite para disparo dos alertas.
 
 ---
 
 ## Resultados Obtidos
 
-Descreva o comportamento final do sistema:
+O projeto funcionou conforme o esperado. O valor obtido do sensor foi convertido de forma proporcional à intensidade da luz, e a imprecisão da conversão foi devidamente tratada por software.
 
-- O que funciona corretamente
-- Quais requisitos foram atendidos
-- Resultado observado na simulação do Wokwi
+Os requisitos foram atendidos com sucesso, sendo eles:
+
+1. **Alerta de micro-parada**
+Dispara corretamente após 5 segundos de bloqueio contínuo da esteira.
+2. **Contagem:**
+Funciona corretamente, contabilizando o produto apenas quando a luminosidade supera o valor pré-definido para esteira livre (500 Lux) após ter ficado abaixo do limite de bloqueio (100 Lux).
+3. **Botão de reset:**
+Funciona perfeitamente, emitindo o aviso serial correspondente e zerando as variáveis de controle para reiniciar o turno.
+4. **Validação no Wokwi CI:**
+O projeto obteve aprovação total nos testes automatizados executados via GitHub Actions.
+
+Todos os requisitos e comportamentos foram testados e validados empiricamente no simulador Wokwi.
 
 ---
 
 ## Comentários Adicionais (Opcional)
-
-Utilize este espaço para comentar, se desejar:
-
-- Dificuldades encontradas
-- Limitações da solução
-- Melhorias que você faria com mais tempo
-- Principais aprendizados durante o desafio
-
----
-
-> Este relatório faz parte da avaliação técnica.  
-> Clareza, objetividade e organização são tão importantes quanto o funcionamento do código.
-
----
-
-## Especificação dos Testes Automatizados (Wokwi CI)
-
-Para que o projeto seja validado com sucesso na esteira de integração contínua (CI), o firmware escrito em MicroPython deve interagir corretamente com as leituras dos sensores descritos em cada cenário e enviar as mensagens de status exatas.
-
-### Requisitos Críticos de Implementação
-
-1. **Casamento Exato de Strings:** O Wokwi CI faz uma verificação estrita caractere por caractere. Se houver divergência em maiúsculas/minúsculas, acentuação ou falta de pontuação, o teste irá falhar.
-2. **Arquitetura Não-Bloqueante:** Evite o uso de funções bloqueantes. Elas podem fazer com que o firmware perca a janela de tempo em que o simulador altera o peso, quebrando a sincronia do teste automatizado.
-
----
-
-## Suporte
-
-Em caso de dúvidas:
-
-- Consulte o material dos cursos EAD
-- Leia atentamente este README
-- Analise os logs das GitHub Actions
-- Utilize os canais oficiais para contato com os instrutores
+1. **Aplicabilidade**
+A solução é aplicável na indústria real, contudo, precisaria de alguns reajustes dependendo do ambiente em que fosse instalada.
+2. **Maior adversidade encontrada**
+A maior dificuldade encontrada deveu-se ao comportamento do sensor fotorresistor (LDR), cuja resposta varia de forma logarítmica em relação à luminosidade. Isso exigiu o desenvolvimento de uma solução via software para contornar essa não-linearidade e adequar a leitura ao cenário da simulação.
+3. **Melhorias no hardware**
+Em uma aplicação industrial real, seria mais eficiente a substituição do LDR por um sensor óptico infravermelho ou laser industrial. Isso eliminaria a interferência da luz ambiente e dispensaria o tratamento analógico complexo.
+4. **Principais aprendizados**
+O projeto foi de grande valia para a consolidação prática no uso de sensores fotorresistores (LDR) e na aplicação de um ambiente de desenvolvimento padronizado via Docker. O uso do container facilitou significativamente o gerenciamento de dependências, a reprodutibilidade do ambiente e a eficiência em todo o processo de programação do sistema embarcado.
