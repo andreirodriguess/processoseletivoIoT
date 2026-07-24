@@ -1,6 +1,5 @@
 import time
 import machine
-import sys
 
 LDR_PIN = machine.Pin(33)
 ldr = machine.ADC(LDR_PIN)
@@ -12,6 +11,7 @@ VALOR_LIVRE = 500
 VALOR_BLOQUEADO = 100 #Pouca iluminação indica que a peça está passando
 LIMITE_TEMPO_TRAVADA = 5000 #Tempo em milissegundos até a emissão do alerta
 
+estado_anterior_botão = 1 #pullup
 numero_de_pecas = 0
 tempo_inicio_passagem = 0
 bloqueado = False
@@ -20,19 +20,19 @@ ultimo_tempo_reset = 0
 
 def lerBotaoResetDebounce():
     global numero_de_pecas, bloqueado, alerta_emitido, tempo_inicio_passagem
-    global ultimo_tempo_reset
-    if (botao_reset.value() == 0) and (time.ticks_ms() - ultimo_tempo_reset > 200):  # Debounce de 200ms
-        numero_de_pecas = 0
-        tempo_inicio_passagem = 0
-        bloqueado = False
-        alerta_emitido = False
-        ultimo_tempo_reset = time.ticks_ms()
-        print("Turno resetado com sucesso. Contadores zerados.")
+    global ultimo_tempo_reset, estado_anterior_botão
+    estado_atual_botao = botao_reset.value()
 
-        time.sleep_ms(100) # Pequena pausa para o terminal transmitir a string e encerra a simulação
-        sys.exit()
-    else:
-        return
+    if estado_atual_botao == 1 and estado_anterior_botão == 0:  # Botão pressionado, depois solto
+        if time.ticks_ms() - ultimo_tempo_reset > 200:  # Debounce de 200ms
+            numero_de_pecas = 0
+            tempo_inicio_passagem = 0
+            bloqueado = False
+            alerta_emitido = False
+            ultimo_tempo_reset = time.ticks_ms()
+            print("Turno resetado com sucesso. Contadores zerados.")
+    estado_anterior_botão = estado_atual_botao
+
 
 def LerLDR():
     leitura_bruta = ldr.read()
