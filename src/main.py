@@ -1,5 +1,6 @@
 import time
 import machine
+import sys
 
 LDR_PIN = machine.Pin(33)
 ldr = machine.ADC(LDR_PIN)
@@ -27,6 +28,9 @@ def lerBotaoResetDebounce():
         alerta_emitido = False
         ultimo_tempo_reset = time.ticks_ms()
         print("Turno resetado com sucesso. Contadores zerados.")
+
+        time.sleep_ms(100) # Pequena pausa para o terminal transmitir a string e encerra a simulação
+        sys.exit()
     else:
         return
 
