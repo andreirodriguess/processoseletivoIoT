@@ -37,8 +37,7 @@ Atua na detecção de objetos na esteira, enviando dados analógicos para a GPIO
 
 ## Decisões Técnicas Relevantes
 1. **Mapeamento por faixas**
-Como o projeto só precisava lidar com certos níveis de intensidade de luminosidade, e como havia uma imprecisão no sensor fotorresistor que tornava difícil a criação de um algoritmo 100% eficiente na conversão do valor digital em bits para o valor correto em Lux, foi decidido fazer uma análise empírica das saídas para determinados valores em Lux escolhidos na simulação Wokwi. Com esses dados, foi possível identificar quando a luminosidade estava abaixo de certos níveis, indicando se a esteira estava ou não bloqueada.
-
+Como o projeto só precisava lidar com certos níveis de intensidade de luminosidade, e como havia uma imprecisão no sensor fotorresistor que tornava difícil a criação de um algoritmo 100% eficiente na conversão do valor digital em bits para o valor correto em Lux, foi decidido fazer uma análise empírica das saídas para determinados valores em Lux escolhidos na simulação Wokwi. Com esses dados, foi possível identificar quando a luminosidade estava abaixo de certos níveis, indicando se a esteira estava ou não bloqueada.  
 Por exemplo, após a leitura do sensor em um ambiente com 500 Lux de intensidade (limite que indicava esteira livre), a saída convertida no algoritmo era de 750 Lux devido à imprecisão do sensor. Optou-se, nesse caso, por converter todas as saídas abaixo de 750 Lux para um valor abaixo de 500, como 480 Lux. Isso foi aplicado em todos os limites de luminosidade, permitindo que o projeto funcionasse corretamente mesmo sem uma conversão exata. Foi uma decisão de engenharia na qual o problema foi resolvido de forma eficiente, sem a necessidade de criar um algoritmo complexo para lidar com a queda logarítmica do valor da saída do sensor.
 
 2. **Decisões gerais**
