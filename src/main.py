@@ -11,7 +11,7 @@ VALOR_LIVRE = 500
 VALOR_BLOQUEADO = 100 #Pouca iluminação indica que a peça está passando
 LIMITE_TEMPO_TRAVADA = 5000 #Tempo em milissegundos até a emissão do alerta
 
-estado_anterior_botão = 1 #pullup
+estado_anterior_botao = 1 #pullup
 numero_de_pecas = 0
 tempo_inicio_passagem = 0
 bloqueado = False
@@ -20,10 +20,10 @@ ultimo_tempo_reset = 0
 
 def lerBotaoResetDebounce():
     global numero_de_pecas, bloqueado, alerta_emitido, tempo_inicio_passagem
-    global ultimo_tempo_reset, estado_anterior_botão
+    global ultimo_tempo_reset, estado_anterior_botao
     estado_atual_botao = botao_reset.value()
 
-    if estado_atual_botao == 1 and estado_anterior_botão == 0:  # Botão pressionado, depois solto
+    if estado_atual_botao == 1 and estado_anterior_botao == 0:  # Botão pressionado, depois solto
         if time.ticks_ms() - ultimo_tempo_reset > 200:  # Debounce de 200ms
             numero_de_pecas = 0
             tempo_inicio_passagem = 0
@@ -31,7 +31,7 @@ def lerBotaoResetDebounce():
             alerta_emitido = False
             ultimo_tempo_reset = time.ticks_ms()
             print("Turno resetado com sucesso. Contadores zerados.")
-    estado_anterior_botão = estado_atual_botao
+    estado_anterior_botao = estado_atual_botao
 
 
 def LerLDR():
@@ -39,9 +39,9 @@ def LerLDR():
     intensidade_luz = (4095 - leitura_bruta) / 4095 * 1000  # Convertendo para porcentagem de luz bloqueada
 
     if intensidade_luz >= 750:
-        intensidade_luz = 1000  # Limite superior para evitar valores muito altos
+        intensidade_luz = 1000  
     elif intensidade_luz <= 498:
-        intensidade_luz = 20  # Limite inferior para evitar valores muito baixos
+        intensidade_luz = 20  
     elif 750 > intensidade_luz > 498:
         intensidade_luz = 480  # Valor intermediário para indicar passagem
     return intensidade_luz
@@ -49,6 +49,7 @@ def LerLDR():
 #código principal
 
 print("Contador de Producao Inicializado")
+
 while True:
 
     intensidade_luz = LerLDR()
