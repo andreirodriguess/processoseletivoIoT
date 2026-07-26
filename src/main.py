@@ -24,7 +24,7 @@ def lerBotaoResetDebounce():
     estado_atual_botao = botao_reset.value()
 
     if estado_atual_botao == 1 and estado_anterior_botao == 0:  # Botão pressionado, depois solto
-        if time.ticks_ms() - ultimo_tempo_reset > 200:  # Debounce de 200ms
+        if time.ticks_diff(time.ticks_ms(), ultimo_tempo_reset) > 200:  # Debounce de 200ms
             numero_de_pecas = 0
             tempo_inicio_passagem = 0
             bloqueado = False
@@ -60,7 +60,7 @@ while True:
             tempo_inicio_passagem = time.ticks_ms()
             bloqueado = True
         else:
-            if (time.ticks_ms() - tempo_inicio_passagem > LIMITE_TEMPO_TRAVADA) and not alerta_emitido: #Se a peça estiver travada além do limite
+            if (time.ticks_diff(time.ticks_ms(), tempo_inicio_passagem) > LIMITE_TEMPO_TRAVADA) and not alerta_emitido: #Se a peça estiver travada além do limite
                 print("Alerta: Micro-parada detectada!")
                 alerta_emitido = True # emite o alerta apenas uma vez até que a peça passe
     elif intensidade_luz > VALOR_LIVRE and bloqueado == True:
