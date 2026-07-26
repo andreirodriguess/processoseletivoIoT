@@ -46,14 +46,9 @@ def LerLDR():
         intensidade_luz = 480  # Valor intermediário para indicar passagem
     return intensidade_luz
 
-#código principal
-
-print("Contador de Producao Inicializado")
-
-while True:
-
+def verificarEsteira():
+    global tempo_inicio_passagem, bloqueado, alerta_emitido, numero_de_pecas
     intensidade_luz = LerLDR()
-
     # se a peça estiver bloqueando a luz ou se já estiver bloqueada e a intensidade de luz ainda estiver baixa
     if intensidade_luz < VALOR_BLOQUEADO or (bloqueado == True and intensidade_luz < VALOR_LIVRE):
         if tempo_inicio_passagem == 0: #tempo de parada será 0 caso ela esteja livre antes
@@ -71,6 +66,13 @@ while True:
             alerta_emitido = False
             bloqueado = False
 
+#código principal
+
+print("Contador de Producao Inicializado")
+
+while True:
+
+    verificarEsteira()
     lerBotaoResetDebounce() #lê o botão de reset ao final do loop
 
     time.sleep_ms(50)  # Pequena pausa ao final
